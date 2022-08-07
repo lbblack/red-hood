@@ -3,7 +3,7 @@ local IdleWalkAISystem = tiny.processingSystem(class("IdleWalkAISystem"))
 function IdleWalkAISystem:init()
 	self.walkTimer = {
 		time = 0,
-		max = 0.5
+		max = 1.5
 	}
 
 	self.idleTimer = {

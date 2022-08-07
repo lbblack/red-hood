@@ -36,7 +36,6 @@ function BumpPhysicsSystem:process(e, dt)
                                                      pos.y + vel.y * dt,
                                                      collisionFilter)
     e.grounded = false
-    e.isLanding = true
 
     if len == 0 then
         e.isWallsliding = false
@@ -66,35 +65,18 @@ function BumpPhysicsSystem:process(e, dt)
                 e.grounded = col.normal.y == -1
                 if not col.other.isEnemy then
                     e.vel.y = 0
-                    e.isLanding = e.landingTimer.count == 0
+                    e.isLanding = e.landingTimer.count == 0 and math.abs(e.vel.x) < e.platforming.speed * 0.4
                 end
             elseif not col.other.isEnemy then
                 e.grounded = false
                 e.landingTimer.time = 0
                 e.landingTimer.count = 0
             end
-
-            -- mutate fall speed while wallsliding
-            if e.isWallsliding and e.vel.y > 0 and not e.isEnemy then
-                e.vel.y = math.min(e.wallslideSpeed, e.vel.y)
-                if e.platforming.dir == 'l' then
-                    e.vel.x = -200
-                else
-                    e.vel.x = 200
-                end
-            end
-        end
-
-        if e.grounded and e.isLanding then
-            e.moving = false
-            e.landingTimer.time = e.landingTimer.time + dt
-            if e.landingTimer.time >= e.landingTimer.maxTime then
-                e.landingTimer.time = 0
-                e.isLanding = false
-                e.landingTimer.count = e.landingTimer.count + 1
-            end
         end
     end
+
+    
+
 end
 
 function BumpPhysicsSystem:onAdd(e)

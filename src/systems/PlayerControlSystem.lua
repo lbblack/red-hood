@@ -14,21 +14,26 @@ function PlayerControlSystem:process(e, dt)
 	keyDown  = "down"
 
 	-- update each animation
-	e.runAnimation:update(dt)
-	e.idleAnimation:update(dt)
-	e.jumpAnimation:update(dt)
-	e.fall1Animation:update(dt)
-	e.fall2Animation:update(dt)
-	e.landingAnimation:update(dt)
-	e.wallslideAnimation:update(dt)
-	e.slideAnimation:update(dt)
+	if e.grounded then
+		e.runAnimation:update(dt)
+		e.idleAnimation:update(dt)
+	else
+		e.jumpAnimation:update(dt)
+		e.fall1Animation:update(dt)
+		e.fall2Animation:update(dt)
+		e.wallslideAnimation:update(dt)
+	end
+
+	if e.isLanding then
+		e.landingAnimation:update(dt)
+	end
 
 	local keyDown = love.keyboard.isDown
 
 	-- try to go right...
 	if keyDown(keyRight) then
 		if e.vel.x < 0 then
-			e.vel.x = math.max(0,
+			e.vel.x = math.min(0,
 							   e.vel.x + e.platforming.decel * dt)
 		else
 			e.vel.x = math.min(e.platforming.speed,
@@ -52,15 +57,15 @@ function PlayerControlSystem:process(e, dt)
 		e.platforming.dir = 'l'
 	end
 
-	if e.isLanding and (keyDown(keyRight) or keyDown(keyLeft)) then
-		if e.landingTimer.time > e.landingTimer.maxTime / 4 then
-			e.isLanding = false
-			e.landingTimer.time = e.landingTimer.maxTime - dt
-		end
-	end
+	-- if e.isLanding and (keyDown(keyRight) or keyDown(keyLeft)) then
+	-- 	if e.landingTimer.time > e.landingTimer.maxTime / 4 then
+	-- 		e.isLanding = false
+	-- 		e.landingTimer.time = e.landingTimer.maxTime - dt
+	-- 	end
+	-- end
 
 	if e.isLanding then
-		local landSpeed = 120
+		local landSpeed = 220
 		if e.vel.x > landSpeed then
 			e.vel.x = landSpeed
 		elseif e.vel.x < -landSpeed then
@@ -71,10 +76,12 @@ function PlayerControlSystem:process(e, dt)
 	-- apply friction if no horizontal movement detected
 	if not keyDown(keyLeft) and not keyDown(keyRight) then
 		local low = 15
+
+		local friction = e.grounded and e.platforming.friction or e.platforming.airFriction
 		if e.vel.x > low then
-			e.vel.x = e.vel.x - e.platforming.friction * dt
+			e.vel.x = e.vel.x - friction * dt
 		elseif e.vel.x < -low then
-			e.vel.x = e.vel.x + e.platforming.friction * dt
+			e.vel.x = e.vel.x + friction * dt
 		else
 			e.vel.x = 0
 		end
@@ -88,9 +95,11 @@ function PlayerControlSystem:process(e, dt)
 	-- handle jumping
 	if (e.grounded or e.isWallsliding) and keyDown(keyUp) then
 		e.vel.y = -e.platforming.jump
+		-- e.isLanding = false
+
 		e.landingTimer.count = 0
 		e.landingTimer.time = 0
-		e.isLanding = false
+		e.landingAnimation:gotoFrame(1)
 
 		-- if e.isWallsliding then
 		-- 	if e.platforming.dir == 'l' then
