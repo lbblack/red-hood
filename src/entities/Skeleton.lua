@@ -22,8 +22,10 @@ function Skeleton:init(args)
 	self.isAlive = true
 	self.isSolid = true
 	self.isEnemy = true
+	self.hit = false
 
 	self.isAttacking = false
+	self.isShielding = false
 
 	self.hitbox = Hitbox({w=20, h=50})
 	self.dir = 'l'
@@ -42,6 +44,16 @@ function Skeleton:init(args)
 	self.attackSprite:setFilter("nearest", "nearest")
 	local gAttack = anim8.newGrid(150, 150, self.attackSprite:getWidth(), self.attackSprite:getHeight())
 	self.attackAnimation = anim8.newAnimation(gAttack('1-8', 1), 0.15)
+
+	self.shieldSprite = love.graphics.newImage("assets/Skeleton/Shield.png")
+	self.shieldSprite:setFilter("nearest", "nearest")
+	local gShield = anim8.newGrid(150, 150, self.shieldSprite:getWidth(), self.shieldSprite:getHeight())
+	self.shieldAnimation = anim8.newAnimation(gShield('1-4', 1), 0.15)
+
+	self.takeHitSprite = love.graphics.newImage("assets/Skeleton/Take Hit.png")
+	self.takeHitSprite:setFilter("nearest", "nearest")
+	local gTakeHit = anim8.newGrid(150, 150, self.takeHitSprite:getWidth(), self.takeHitSprite:getHeight())
+	self.takeHitAnimation = anim8.newAnimation(gTakeHit('1-4', 1), 0.15)
 end
 
 return Skeleton

@@ -26,6 +26,10 @@ function UpdateSystem:process(e, dt)
         	e.runAnimation:update(dt)
         	e.idleAnimation:update(dt)
         	e.landingAnimation:update(dt)
+
+            if e.isAttacking then
+                e.attack1Animation:update(dt)
+            end
         end
 
         -- reset landing animation
@@ -51,7 +55,7 @@ function UpdateSystem:process(e, dt)
         if e.landingTimer.time == 0 and e.landingTimer.count == 0 then
             e.isLanding = e.grounded
         end
-        print("Player = ", e.isLanding, e.landingTimer.time, e.landingTimer.count, e.grounded)
+        -- print("Player = ", e.isLanding, e.landingTimer.time, e.landingTimer.count, e.grounded)
 
         -- mutate fall speed while wallsliding
         if e.isWallsliding and e.vel.y > 0 and not e.isEnemy then

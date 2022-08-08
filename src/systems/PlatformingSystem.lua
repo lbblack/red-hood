@@ -7,6 +7,17 @@ function PlatformingSystem:process(e, dt)
 		return
 	end
 
+	if e.isEnemy then
+		local enemyLow = 20
+		if e.hit and e.vel.x > enemyLow then
+			e.vel.x = e.vel.x - 80 * dt
+		elseif e.hit and e.vel.x < -enemyLow then
+			e.vel.x = e.vel.x + 80 * dt
+		else
+			e.vel.x = 0
+		end
+	end
+
 	local gravity = e.gravity or 0
     e.vel.y = e.vel.y + gravity * dt
 end

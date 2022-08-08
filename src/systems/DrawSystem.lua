@@ -18,10 +18,21 @@ function DrawSystem:process(e, dt)
 		-- draw player animations
 		elseif e.isPlayer then
 			self.cam:setPosition(e.pos.x, e.pos.y)
-			love.graphics.setColor(1, 1, 1, e.alpha)
 			-- love.graphics.rectangle("line", e.pos.x, e.pos.y, e.hitbox.w, e.hitbox.h)
 			-- love.graphics.rectangle("fill", e.pos.x, e.pos.y, e.hitbox.w, e.hitbox.h)
 
+			if e.activeHitbox.active then
+				love.graphics.setColor(1, 0, 0, 1)
+			else
+				love.graphics.setColor(0, 1, 0, 1)
+			end
+
+			love.graphics.rectangle("line", e.pos.x - e.activeHitbox.w, e.pos.y + 5,
+				e.activeHitbox.w, e.activeHitbox.h)
+			love.graphics.rectangle("line", e.pos.x + e.hitbox.w, e.pos.y + 5,
+				e.activeHitbox.w, e.activeHitbox.h)
+
+			love.graphics.setColor(1, 1, 1, e.alpha)
 
 			-- player animation
 			-- most of these values are empirical lol
@@ -34,8 +45,14 @@ function DrawSystem:process(e, dt)
 			local offb = 41
 			-- e.fall2Animation:draw(e.sprite, e.pos.x + offx.left, e.pos.y, 0, 1, 1, 44, offy - 15)
 
+			if e.isAttacking or e.activeHitbox.active then
+				if e.platforming.dir == 'l' then
+					e.attack1Animation:draw(e.sprite, e.pos.x, e.pos.y, 0, 1, 1, offa + 2, offy - 15)
+				else
+					e.attack1Animation:draw(e.sprite, e.pos.x, e.pos.y, 0, -1, 1, offb + 2, offy - 15)
+				end
 			-- running animation
-			if e.grounded and math.abs(e.vel.x) > 15 and not e.isLanding then
+			elseif e.grounded and math.abs(e.vel.x) > 15 and not e.isLanding then
 				if e.vel.x ~= 0 and e.runAnimation then
 					-- running left
 					if e.platforming.dir == 'l' then
@@ -95,9 +112,9 @@ function DrawSystem:process(e, dt)
 					e.landingAnimation:draw(e.sprite, e.pos.x + offx.left, e.pos.y, 0, -1, 1, offb, 20)
 				end
 			end
-		elseif e.isEnemy then
+		elseif e.isEnemy and not e.hit then
 			-- love.graphics.rectangle("line", e.pos.x, e.pos.y, e.hitbox.w, e.hitbox.h)
-			if not e.isAttacking then
+			if e.ai == "idle" or e.ai == "idleWalk" then
 				if math.abs(e.vel.x) < 20 then
 					if e.dir == 'r' then
 						e.idleAnimation:draw(e.idleSprite, e.pos.x, e.pos.y, 0, 1, 1, 70, 50)
@@ -112,11 +129,25 @@ function DrawSystem:process(e, dt)
 					end
 				end
 			else
-				if e.dir == 'r' then
-					e.attackAnimation:draw(e.attackSprite, e.pos.x, e.pos.y, 0, 1, 1, 70, 50)
-				else
-					e.attackAnimation:draw(e.attackSprite, e.pos.x, e.pos.y, 0, -1, 1, 90, 50)
+				if e.ai == "shield" then
+					if e.dir == 'r' then
+						e.shieldAnimation:draw(e.shieldSprite, e.pos.x, e.pos.y, 0, 1, 1, 70, 50)
+					else
+						e.shieldAnimation:draw(e.shieldSprite, e.pos.x, e.pos.y, 0, -1, 1, 90, 50)
+					end
+				elseif e.ai == "attack" then
+					if e.dir == 'r' then
+						e.attackAnimation:draw(e.attackSprite, e.pos.x, e.pos.y, 0, 1, 1, 70, 50)
+					else
+						e.attackAnimation:draw(e.attackSprite, e.pos.x, e.pos.y, 0, -1, 1, 90, 50)
+					end
 				end
+			end
+		elseif e.isEnemy and e.hit then
+			if e.dir == 'r' then
+				e.takeHitAnimation:draw(e.takeHitSprite, e.pos.x, e.pos.y, 0, 1, 1, 70, 50)
+			else
+				e.takeHitAnimation:draw(e.takeHitSprite, e.pos.x, e.pos.y, 0, -1, 1, 90, 50)
 			end
 		end
 	end)

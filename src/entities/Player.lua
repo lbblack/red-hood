@@ -53,8 +53,10 @@ function Player:init(args)
 	self.landingAnimation = anim8.newAnimation(g('49-54', 1), 0.2)
 	self.wallslideAnimation = anim8.newAnimation(g('55-58', 1), 0.23)
 	self.slideAnimation = anim8.newAnimation(g('55-61', 1), 0.15)
+	self.attack1Animation = anim8.newAnimation(g('62-73', 1), 0.15)
 	g = anim8.newGrid(64 + 16, 80, self.idleSprite:getWidth(), self.idleSprite:getHeight())
 	self.idleAnimation = anim8.newAnimation(g('1-18', 1), 0.15)
+
 
 	self.spriteAnimations = {
 		self.idleAnimation,
@@ -68,6 +70,16 @@ function Player:init(args)
 	}
 
 	self.hitbox = Hitbox({w = 20, h = 25})
+
+	self.attackTimer = {
+		time = 0,
+		maxTime = 2.1,
+		count = 0
+	}
+
+	self.attackSpeed = 500
+	self.isAttacking = false
+	self.activeHitbox = Hitbox({w = 30, h = 15, active=false, hostile=true})
 
 	self.maxHealth = 100
 	self.health = self.maxhealth

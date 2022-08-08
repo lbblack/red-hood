@@ -30,6 +30,16 @@ function PlayerControlSystem:process(e, dt)
 
 	local keyDown = love.keyboard.isDown
 
+	-- try attack
+	if e.grounded then
+		local attacktime = e.attackTimer.time
+		local maxtime = e.attackTimer.maxTime
+		if keyDown("space") and attacktime <= maxtime then
+			e.isAttacking = true
+			e.activeHitbox.active = true
+		end
+	end
+
 	-- try to go right...
 	if keyDown(keyRight) then
 		if e.vel.x < 0 then
@@ -38,6 +48,10 @@ function PlayerControlSystem:process(e, dt)
 		else
 			e.vel.x = math.min(e.platforming.speed,
 							   e.vel.x + e.platforming.accel * dt)
+		end
+
+		if e.isAttacking then
+			e.vel.x = e.attackSpeed * dt
 		end
 
 		e.platforming.dir = 'r'
@@ -52,6 +66,10 @@ function PlayerControlSystem:process(e, dt)
 		else
 			-- set the velocity to acceleration to the left
 			e.vel.x = math.max(e.vel.x - e.platforming.accel * dt, -e.platforming.speed)
+		end
+
+		if e.isAttacking then
+			e.vel.x = -e.attackSpeed * dt
 		end
 		
 		e.platforming.dir = 'l'
@@ -88,12 +106,13 @@ function PlayerControlSystem:process(e, dt)
 		e.moving = false
 	end
 
+	-- slide down wall slowly
 	if e.isWallsliding then
 		e.vel.y = math.min(e.wallslideSpeed, e.vel.y)
 	end
 
 	-- handle jumping
-	if (e.grounded or e.isWallsliding) and keyDown(keyUp) then
+	if (e.grounded or e.isWallsliding) and (not e.isAttacking) and keyDown(keyUp) then
 		e.vel.y = -e.platforming.jump
 		-- e.isLanding = false
 
