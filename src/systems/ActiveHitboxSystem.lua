@@ -20,7 +20,7 @@ function ActiveHitboxSystem:process(e, dt)
 	end
 
 	if e.isEnemy and e.hit then
-		e.takeHitAnimation:update(dt)
+		-- e.takeHitAnimation:update(dt)
 	end
 end
 

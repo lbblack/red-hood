@@ -16,7 +16,8 @@ function Player:init(args)
 		airFriction = 400,
 		decel = 800,
 		dir = 'r',
-		jump = 445
+		jump = 445,
+		jumpStrengh = 0
 	}
 	self.speed = 300
 	self.controlable = true

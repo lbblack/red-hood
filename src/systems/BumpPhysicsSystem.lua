@@ -121,12 +121,64 @@ function BumpPhysicsSystem:process(e, dt)
                     item.dir = 'l'
                 end
 
-                item.hit = true
-            else
+                if ((item.dir == 'l' and e.platforming.dir == 'r') or
+                    (item.dir == 'r' and e.platforming.dir == 'l')) and item.ai ~= "shield" then
+                    item.hit = true
+                else
+                    item.hit = false
+                end
+            elseif item.isEnemy and not activeHitbox.active then
                 item.hit = false
             end
         end
+    end
 
+    if e.isEnemy then
+
+        -- detecting for player hit
+        local items, len1 = self.bumpWorld:queryRect(e.pos.x - 75, e.pos.y, 75, e.hitbox.h)
+        for i = 1, len1 do
+            local item = items[i]
+
+            if item.isPlayer then
+                if item.isAttacking then
+                    if not (e.dir == 'l' and item.platforming.dir == 'r') and
+                       not (e.dir == 'r' and item.platforming.dir == 'l') then
+                        e.hit = false
+                    end
+                end
+
+                if not item.activeHitbox.active then
+                    e.hit = false
+                end
+            end
+        end
+
+        items, len2 = self.bumpWorld:queryRect(e.pos.x + e.hitbox.w, e.pos.y, 75, e.hitbox.h)
+        for i = 1, len2 do
+            local item = items[i]
+
+            if item.isPlayer then
+                if item.isAttacking then
+                    if not (e.dir == 'l' and item.platforming.dir == 'r') and
+                       not (e.dir == 'r' and item.platforming.dir == 'l') then
+                        e.hit = false
+                    end
+                end
+
+                if not item.activeHitbox.active then
+                    e.hit = false
+                end
+            end
+        end
+
+        if len1 == 0 and len2 == 0 then
+            e.hit = false
+        end
+
+        if e.isAttacking then
+
+        end
     end
 end
 

@@ -17,6 +17,7 @@ function Skeleton:init(args)
 	}
 	self.gravity = 400
 	self.speed = 25
+	self.attackSpeed = 150
 
 	self.ai = "idleWalk"
 	self.isAlive = true
